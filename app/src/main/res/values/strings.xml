@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Video Player</string>
+    <string name="open_video">Open video</string>
+    <string name="empty_title">Video Player</string>
+    <string name="empty_subtitle">Pick a video from your device to start playing.</string>
+</resources>
