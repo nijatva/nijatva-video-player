@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,6 +34,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nijatva.videoplayer.BuildConfig
 import com.nijatva.videoplayer.ui.components.SectionHeader
@@ -46,11 +46,10 @@ private const val REPO_URL = "https://github.com/vasudev-work/nijatva-video-play
 @Composable
 fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
     val context = LocalContext.current
+    val scheme = MaterialTheme.colorScheme
 
     fun openUrl(url: String) {
-        runCatching {
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-        }
+        runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
     }
 
     ZScreen(title = "About", onBack = onBack) { modifier ->
@@ -58,33 +57,30 @@ fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
             modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            /* ---- hero card, follows the chosen accent ---- */
             item {
                 Spacer(Modifier.height(8.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(
-                            Brush.linearGradient(
-                                listOf(Color(0xFF10B981), Color(0xFF1D4ED8)),
-                            ),
-                        )
-                        .padding(16.dp),
+                        .clip(RoundedCornerShape(28.dp))
+                        .background(Brush.linearGradient(listOf(scheme.primary, scheme.secondary)))
+                        .padding(20.dp),
                 ) {
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
-                                    .size(56.dp)
+                                    .size(60.dp)
                                     .clip(CircleShape)
-                                    .background(Color(0xFF121212)),
+                                    .background(Color.Black.copy(alpha = 0.34f)),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     Icons.Filled.PlayArrow,
                                     contentDescription = null,
-                                    tint = Color(0xFF6EE7B7),
-                                    modifier = Modifier.size(32.dp),
+                                    tint = Color.White,
+                                    modifier = Modifier.size(34.dp),
                                 )
                             }
                             Spacer(Modifier.width(16.dp))
@@ -102,28 +98,30 @@ fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
                                 )
                             }
                         }
-                        Spacer(Modifier.height(16.dp))
+
+                        Spacer(Modifier.height(18.dp))
+
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             Button(
                                 onClick = onOpenLibraries,
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(14.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFA7F3D0),
-                                    contentColor = Color(0xFF052E16),
+                                    containerColor = Color.White.copy(alpha = 0.18f),
+                                    contentColor = Color.White,
                                 ),
                             ) {
                                 Icon(Icons.Filled.LibraryBooks, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(8.dp))
                                 Text("Libraries", fontWeight = FontWeight.SemiBold)
                             }
-                            FilledTonalButton(
+                            Button(
                                 onClick = { openUrl(REPO_URL) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(14.dp),
-                                colors = ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = Color(0xFFBFDBFE),
-                                    contentColor = Color(0xFF0B2A5B),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.White.copy(alpha = 0.18f),
+                                    contentColor = Color.White,
                                 ),
                             ) {
                                 Icon(Icons.Filled.Code, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -145,16 +143,47 @@ fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
                         )
                     }
                     Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                        Text("Package", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Package", style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant)
                         Text(BuildConfig.APPLICATION_ID, style = MaterialTheme.typography.bodyMedium)
                     }
                     Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                        Text("License", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("License", style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant)
                         Text("Apache License 2.0", style = MaterialTheme.typography.bodyMedium)
                     }
                     Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                        Text("Copyright", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Copyright", style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant)
                         Text("© 2026 Vasudev Dangaya", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
+
+            /* ---- footer ---- */
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        "Designed & developed by Vasudev Dangaya",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = scheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(50))
+                            .background(Brush.horizontalGradient(listOf(Color(0xFFFF9933), Color(0xFFFFFFFF), Color(0xFF138808))))
+                            .padding(vertical = 10.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            "MAKE IN INDIA",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF111111),
+                        )
                     }
                 }
             }
