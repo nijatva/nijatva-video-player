@@ -1,11 +1,7 @@
 package com.nijatva.videoplayer.data
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import android.content.SharedPreferences
 import com.nijatva.videoplayer.data.model.NetworkConnection
 import com.nijatva.videoplayer.data.model.Playlist
 import kotlinx.coroutines.CoroutineScope
@@ -19,14 +15,17 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "nijatva_prefs")
-
 internal val appJson = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
-private val KEY_SETTINGS = stringPreferencesKey("settings_json")
-private val KEY_HISTORY = stringPreferencesKey("history_json")
-private val KEY_CONNECTIONS = stringPreferencesKey("connections_json")
-private val KEY_PLAYLISTS = stringPreferencesKey("playlists_json")
+/* Plain SharedPreferences — no DataStore dependency. */
+private const val PREFS_NAME = "nijatva_prefs"
+private const val KEY_SETTINGS = "settings_json"
+private const val KEY_HISTORY = "history_json"
+private const val KEY_CONNECTIONS = "connections_json"
+private const val KEY_PLAYLISTS = "playlists_json"
+
+private fun Context.prefs(): SharedPreferences =
+    getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 /** Persists the whole [Settings] object as a JSON blob. */
 class SettingsRepository(private val context: Context) {
@@ -37,14 +36,11 @@ class SettingsRepository(private val context: Context) {
 
     init {
         scope.launch {
-            context.dataStore.data.collect { prefs ->
-                val raw = prefs[KEY_SETTINGS]
-                _settings.value = if (raw.isNullOrBlank()) {
-                    Settings()
-                } else {
-                    runCatching { appJson.decodeFromString(Settings.serializer(), raw) }
-                        .getOrDefault(Settings())
-                }
+            val raw = context.prefs().getString(KEY_SETTINGS, null)
+            if (!raw.isNullOrBlank()) {
+                _settings.value = runCatching {
+                    appJson.decodeFromString(Settings.serializer(), raw)
+                }.getOrDefault(Settings())
             }
         }
     }
@@ -53,8 +49,14 @@ class SettingsRepository(private val context: Context) {
     fun update(transform: (Settings) -> Settings) {
         val updated = transform(_settings.value)
         _settings.value = updated
+        persist(updated)
+    }
+
+    private fun persist(value: Settings) {
         scope.launch {
-            context.dataStore.edit { it[KEY_SETTINGS] = appJson.encodeToString(Settings.serializer(), updated) }
+            context.prefs().edit()
+                .putString(KEY_SETTINGS, appJson.encodeToString(Settings.serializer(), value))
+                .apply()
         }
     }
 
@@ -63,9 +65,7 @@ class SettingsRepository(private val context: Context) {
     fun importJson(text: String): Boolean = runCatching {
         val parsed = appJson.decodeFromString(Settings.serializer(), text)
         _settings.value = parsed
-        scope.launch {
-            context.dataStore.edit { it[KEY_SETTINGS] = appJson.encodeToString(Settings.serializer(), parsed) }
-        }
+        persist(parsed)
         true
     }.getOrDefault(false)
 }
@@ -79,11 +79,11 @@ class HistoryRepository(private val context: Context) {
 
     init {
         scope.launch {
-            context.dataStore.data.collect { prefs ->
-                val raw = prefs[KEY_HISTORY]
-                _recent.value = if (raw.isNullOrBlank()) emptyList()
-                else runCatching { appJson.decodeFromString(ListSerializer(String.serializer()), raw) }
-                    .getOrDefault(emptyList())
+            val raw = context.prefs().getString(KEY_HISTORY, null)
+            if (!raw.isNullOrBlank()) {
+                _recent.value = runCatching {
+                    appJson.decodeFromString(ListSerializer(String.serializer()), raw)
+                }.getOrDefault(emptyList())
             }
         }
     }
@@ -92,17 +92,15 @@ class HistoryRepository(private val context: Context) {
         val updated = (listOf(uri) + _recent.value.filterNot { it == uri }).take(50)
         _recent.value = updated
         scope.launch {
-            context.dataStore.edit {
-                it[KEY_HISTORY] = appJson.encodeToString(
-                    ListSerializer(String.serializer()), updated
-                )
-            }
+            context.prefs().edit()
+                .putString(KEY_HISTORY, appJson.encodeToString(ListSerializer(String.serializer()), updated))
+                .apply()
         }
     }
 
     fun clear() {
         _recent.value = emptyList()
-        scope.launch { context.dataStore.edit { it.remove(KEY_HISTORY) } }
+        scope.launch { context.prefs().edit().remove(KEY_HISTORY).apply() }
     }
 }
 
@@ -115,13 +113,10 @@ class ConnectionsRepository(private val context: Context) {
 
     init {
         scope.launch {
-            context.dataStore.data.collect { prefs ->
-                val raw = prefs[KEY_CONNECTIONS]
-                _connections.value = if (raw.isNullOrBlank()) emptyList()
-                else runCatching {
-                    appJson.decodeFromString(
-                        ListSerializer(NetworkConnection.serializer()), raw
-                    )
+            val raw = context.prefs().getString(KEY_CONNECTIONS, null)
+            if (!raw.isNullOrBlank()) {
+                _connections.value = runCatching {
+                    appJson.decodeFromString(ListSerializer(NetworkConnection.serializer()), raw)
                 }.getOrDefault(emptyList())
             }
         }
@@ -129,27 +124,22 @@ class ConnectionsRepository(private val context: Context) {
 
     fun add(connection: NetworkConnection) {
         val updated = _connections.value.filterNot { it.id == connection.id } + connection
-        _connections.value = updated
         persist(updated)
     }
 
     fun remove(id: String) {
-        val updated = _connections.value.filterNot { it.id == id }
-        _connections.value = updated
-        persist(updated)
+        persist(_connections.value.filterNot { it.id == id })
     }
 
     private fun persist(list: List<NetworkConnection>) {
+        _connections.value = list
         scope.launch {
-            context.dataStore.edit {
-                it[KEY_CONNECTIONS] = appJson.encodeToString(
-                    ListSerializer(NetworkConnection.serializer()), list
-                )
-            }
+            context.prefs().edit()
+                .putString(KEY_CONNECTIONS, appJson.encodeToString(ListSerializer(NetworkConnection.serializer()), list))
+                .apply()
         }
     }
 }
-
 
 /** Stores the user's playlists. */
 class PlaylistRepository(private val context: Context) {
@@ -160,10 +150,9 @@ class PlaylistRepository(private val context: Context) {
 
     init {
         scope.launch {
-            context.dataStore.data.collect { prefs ->
-                val raw = prefs[KEY_PLAYLISTS]
-                _playlists.value = if (raw.isNullOrBlank()) emptyList()
-                else runCatching {
+            val raw = context.prefs().getString(KEY_PLAYLISTS, null)
+            if (!raw.isNullOrBlank()) {
+                _playlists.value = runCatching {
                     appJson.decodeFromString(ListSerializer(Playlist.serializer()), raw)
                 }.getOrDefault(emptyList())
             }
@@ -171,8 +160,7 @@ class PlaylistRepository(private val context: Context) {
     }
 
     fun create(name: String) {
-        val updated = _playlists.value + Playlist(id = java.util.UUID.randomUUID().toString(), name = name)
-        persist(updated)
+        persist(_playlists.value + Playlist(id = java.util.UUID.randomUUID().toString(), name = name))
     }
 
     fun delete(id: String) {
@@ -194,9 +182,9 @@ class PlaylistRepository(private val context: Context) {
     private fun persist(list: List<Playlist>) {
         _playlists.value = list
         scope.launch {
-            context.dataStore.edit {
-                it[KEY_PLAYLISTS] = appJson.encodeToString(ListSerializer(Playlist.serializer()), list)
-            }
+            context.prefs().edit()
+                .putString(KEY_PLAYLISTS, appJson.encodeToString(ListSerializer(Playlist.serializer()), list))
+                .apply()
         }
     }
 }
