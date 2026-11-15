@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.nijatva.videoplayer.ui.AppNavigation
@@ -27,15 +26,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val settings by app.settingsRepository.settings.collectAsState()
-            val darkTheme = when (settings.themeMode) {
-                1 -> false
-                2 -> true
-                else -> isSystemInDarkTheme()
-            }
             NijatvaTheme(
-                darkTheme = darkTheme,
+                themeMode = settings.themeMode,
+                accent = settings.accent,
                 dynamicColor = settings.dynamicColor,
-                highContrastDark = settings.highContrastDark,
             ) {
                 AppNavigation(initialUri = initialUri)
             }

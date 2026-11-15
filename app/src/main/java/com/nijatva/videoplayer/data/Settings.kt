@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Settings(
     // Appearance
-    val themeMode: Int = 0,              // 0 = system, 1 = light, 2 = dark
+    val themeMode: Int = 0,              // 0 = system, 1 = light, 2 = dark, 3 = black (OLED)
+    val accent: Int = 0,                 // 0 = green, 1 = saffron, 2 = indigo
     val highContrastDark: Boolean = false,
     val dynamicColor: Boolean = false,
 
