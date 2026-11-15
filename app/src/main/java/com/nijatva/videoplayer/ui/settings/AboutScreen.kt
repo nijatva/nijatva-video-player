@@ -46,7 +46,7 @@ import com.nijatva.videoplayer.ui.components.ZScreen
 private const val REPO_URL = "https://github.com/vasudev-work/nijatva-video-player"
 private const val PROFILE_URL = "https://github.com/vasudev-work"
 private const val WEBSITE = "github.com/vasudev-work"
-private const val EMAIL = "Vasudev.Social@rediffmail.com"
+private const val EMAIL = "vasudev.work@rediffmail.com"
 
 @Composable
 fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
