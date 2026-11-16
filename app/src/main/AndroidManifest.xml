@@ -12,6 +12,18 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+        <!-- Nijatva family: needed on Android 11+ to see and launch these apps -->
+    <queries>
+        <package android:name="com.nijatva.photos" />
+        <package android:name="com.nijatva.gallery" />
+        <package android:name="com.nijatva.camera" />
+        <package android:name="com.nijatva.photo.editor" />
+        <package android:name="com.nijatva.videoplayer" />
+        <package android:name="com.nijatva.music.player" />
+        <package android:name="com.nijatva.file" />
+        <package android:name="in.nijatva.browser" />
+    </queries>
+
     <application
         android:name=".NijatvaApplication"
         android:allowBackup="true"
