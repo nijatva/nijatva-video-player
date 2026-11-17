@@ -168,6 +168,20 @@ fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
 
                     Spacer(Modifier.height(18.dp))
 
+                    OutlinedButton(
+                        onClick = {
+                            context.startActivity(
+                                com.nijatva.signature.Signature.developer(context)
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        shape = RoundedCornerShape(50),
+                    ) {
+                        Text("Nijatva signature")
+                    }
+
+                    Spacer(Modifier.height(10.dp))
+
                     Button(
                         onClick = { openUrl(PROFILE_URL) },
                         modifier = Modifier.fillMaxWidth().height(50.dp),
