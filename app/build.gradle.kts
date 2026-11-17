@@ -57,6 +57,8 @@ kotlin {
 }
 
 dependencies {
+    // Nijatva signature: shared Appearance + Developer screens
+    implementation(files("libs/nijatva-signature-1.0.0.aar"))
     implementation(platform(libs.androidx.compose.bom))
 
     implementation(libs.androidx.core.ktx)
