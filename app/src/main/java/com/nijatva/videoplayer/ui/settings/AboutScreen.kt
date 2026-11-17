@@ -45,12 +45,12 @@ import com.nijatva.videoplayer.ui.components.SectionHeader
 import com.nijatva.videoplayer.ui.components.SettingsGroup
 import com.nijatva.videoplayer.ui.components.ZScreen
 
-private const val REPO_URL = "https://github.com/vasudev-work/nijatva-video-player"
+private const val REPO_URL = "https://github.com/nijatva/nijatva-video-player"
 private const val PROFILE_URL = "https://github.com/vasudev-work"
-private const val WEBSITE = "github.com/vasudev-work"
+private const val WEBSITE = "nijatva.github.io"
 private const val EMAIL = "vasudev.work@rediffmail.com"
-private const val WEB_APP_URL = "https://vasudev-work.github.io/nijatva-video-player-multiplatform/app/"
-private const val WEBSITE_URL = "https://vasudev-work.github.io/nijatva-video-player-multiplatform/"
+private const val WEB_APP_URL = "https://nijatva.github.io/nijatva-video-player-multiplatform/app/"
+private const val WEBSITE_URL = "https://nijatva.github.io/nijatva-video-player-multiplatform/"
 
 @Composable
 fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
