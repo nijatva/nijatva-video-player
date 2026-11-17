@@ -15,8 +15,8 @@ android {
         applicationId = "com.nijatva.videoplayer"
         minSdk = 24
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.1.4"
+        versionCode = 7
+        versionName = "1.1.5"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -57,8 +57,6 @@ kotlin {
 }
 
 dependencies {
-    // Nijatva signature: shared Appearance + Developer screens
-    implementation(files("libs/nijatva-signature-1.0.0.aar"))
     implementation(platform(libs.androidx.compose.bom))
 
     implementation(libs.androidx.core.ktx)

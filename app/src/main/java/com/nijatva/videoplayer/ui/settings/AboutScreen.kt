@@ -20,7 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -47,6 +49,8 @@ private const val REPO_URL = "https://github.com/vasudev-work/nijatva-video-play
 private const val PROFILE_URL = "https://github.com/vasudev-work"
 private const val WEBSITE = "github.com/vasudev-work"
 private const val EMAIL = "vasudev.work@rediffmail.com"
+private const val WEB_APP_URL = "https://vasudev-work.github.io/nijatva-video-player-multiplatform/app/"
+private const val WEBSITE_URL = "https://vasudev-work.github.io/nijatva-video-player-multiplatform/"
 
 @Composable
 fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
@@ -168,20 +172,6 @@ fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
 
                     Spacer(Modifier.height(18.dp))
 
-                    OutlinedButton(
-                        onClick = {
-                            context.startActivity(
-                                com.nijatva.signature.Signature.developer(context)
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth().height(50.dp),
-                        shape = RoundedCornerShape(50),
-                    ) {
-                        Text("Nijatva signature")
-                    }
-
-                    Spacer(Modifier.height(10.dp))
-
                     Button(
                         onClick = { openUrl(PROFILE_URL) },
                         modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -220,6 +210,18 @@ fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
                         Text("License", style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant)
                         Text("Apache License 2.0", style = MaterialTheme.typography.bodyMedium)
                     }
+                    LinkRow(
+                        icon = Icons.Filled.Language,
+                        title = "Web app",
+                        subtitle = "Browser me wahi player chalao",
+                        onClick = { openUrl(WEB_APP_URL) },
+                    )
+                    LinkRow(
+                        icon = Icons.Filled.Public,
+                        title = "Website",
+                        subtitle = "Download page for all platforms",
+                        onClick = { openUrl(WEBSITE_URL) },
+                    )
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -271,6 +273,31 @@ fun AboutScreen(onBack: () -> Unit, onOpenLibraries: () -> Unit) {
             }
             item { Spacer(Modifier.height(16.dp)) }
         }
+    }
+}
+
+@Composable
+private fun LinkRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+) {
+    val scheme = MaterialTheme.colorScheme
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = scheme.primary)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+        }
+        Text("›", style = MaterialTheme.typography.titleMedium, color = scheme.onSurfaceVariant)
     }
 }
 
